@@ -13,12 +13,12 @@ import java.util.function.Function;
 public class JwtService {
     private static final String SECRET_KEY = "xXopuniMHtHJ6px5xmLcD9ebnf4dmZhW";
     public String extractUsername(String token) {
-        return null;
+        return extractClaim(token, Claims::getSubject);
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims); 
+        return claimsResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
