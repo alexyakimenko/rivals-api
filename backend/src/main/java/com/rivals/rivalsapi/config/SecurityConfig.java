@@ -1,6 +1,6 @@
 package com.rivals.rivalsapi.config;
 
-import com.rivals.rivalsapi.filter.JwtAuthenticationFilter;
+import com.rivals.rivalsapi.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private JwtAuthenticationFilter jwtAuthFilter;
+    private JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
