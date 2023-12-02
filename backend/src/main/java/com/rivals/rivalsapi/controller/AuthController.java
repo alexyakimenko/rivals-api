@@ -29,7 +29,7 @@ public class AuthController {
         }
     }
 
-    @GetMapping(path = "/login")
+    @PostMapping(path = "/login")
     public ResponseEntity<Object> authenticate(
             @RequestBody AuthRequestDto authDto
     ) {
