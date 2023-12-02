@@ -7,6 +7,9 @@ import com.rivals.rivalsapi.model.Role;
 import com.rivals.rivalsapi.model.User;
 import com.rivals.rivalsapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public AuthResponseDto register(RegisterDto registerDto) {
         User user = User.builder()
@@ -34,6 +38,17 @@ public class AuthService {
     }
 
     public AuthResponseDto authenticate(AuthRequestDto authDto) {
-        return null;
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authDto.getUsername(),
+                        authDto.getPassword()
+                )
+        );
+        User user = userRepository.findByUsername(authDto.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        String jwtToken = jwtService.generateToken(user);
+        return AuthResponseDto.builder()
+                .token(jwtToken)
+                .build();
     }
 }
