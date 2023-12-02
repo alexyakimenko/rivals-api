@@ -8,6 +8,7 @@ import java.security.Key;
 
 @Service
 public class JwtService {
+    private static final String SECRET_KEY = "xXopuniMHtHJ6px5xmLcD9ebnf4dmZhW";
     public String extractUsername(String token) {
         return null;
     }
