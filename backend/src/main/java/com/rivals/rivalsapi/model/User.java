@@ -13,10 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-enum Role {
-    USER,
-    ADMIN
-}
 @Data
 @Builder
 @NoArgsConstructor
