@@ -2,6 +2,8 @@ package com.rivals.rivalsapi.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -23,7 +25,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        // TODO: implement getSignInKey method
-        return null;
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
