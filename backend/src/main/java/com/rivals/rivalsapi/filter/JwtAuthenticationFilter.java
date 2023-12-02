@@ -1,4 +1,4 @@
-package com.rivals.rivalsapi.config;
+package com.rivals.rivalsapi.filter;
 
 import com.rivals.rivalsapi.service.JwtService;
 import jakarta.servlet.FilterChain;
