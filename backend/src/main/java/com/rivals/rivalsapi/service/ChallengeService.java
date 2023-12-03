@@ -9,14 +9,15 @@ import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +32,10 @@ public class ChallengeService {
         return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
     }
 
-    public List<ChallengeDto> getAllChallenges() {
-        return challengeRepository.findAll().stream()
-                .map(ChallengeDto::fromChallenge)
-                .collect(Collectors.toList());
+    public Page<ChallengeDto> getAllChallenges(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return challengeRepository.findAll(pageable)
+                .map(ChallengeDto::fromChallenge);
     }
 
     public ChallengeDto getChallengeById(Long challengeId) {

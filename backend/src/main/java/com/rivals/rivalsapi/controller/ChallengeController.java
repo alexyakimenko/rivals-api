@@ -15,9 +15,12 @@ public class ChallengeController {
     private final ChallengeService challengeService;
 
     @GetMapping
-    public ResponseEntity<Object> getAllChallenges() {
+    public ResponseEntity<Object> getAllChallenges(
+            @RequestParam(defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(defaultValue = "10", required = false) int pageSize
+    ) {
         try {
-            return ResponseEntity.ok(challengeService.getAllChallenges());
+            return ResponseEntity.ok(challengeService.getAllChallenges(pageNumber, pageSize));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
