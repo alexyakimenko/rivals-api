@@ -2,6 +2,7 @@ package com.rivals.rivalsapi.controller;
 
 import com.rivals.rivalsapi.dto.challenge.AddChallengeDto;
 import com.rivals.rivalsapi.service.ChallengeService;
+import com.rivals.rivalsapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ChallengeController {
     private final ChallengeService challengeService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<Object> getAllChallenges(
@@ -32,6 +34,40 @@ public class ChallengeController {
     ) {
         try {
             return ResponseEntity.ok(challengeService.getChallengeById(challenge_id));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping(path = "/starred")
+    public ResponseEntity<Object> getStarred(
+            @RequestParam(defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(defaultValue = "10", required = false) int pageSize
+    ) {
+        try {
+            return ResponseEntity.ok(userService.getStarredChallenges(pageNumber, pageSize));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping(path = "/starred/{challenge_id}")
+    public ResponseEntity<Object> starChallenge(
+            @PathVariable Long challenge_id
+    ) {
+        try {
+            return ResponseEntity.ok(userService.starChallenge(challenge_id));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping(path = "/starred/{challenge_id}")
+    public ResponseEntity<Object> unstarChallenge(
+            @PathVariable Long challenge_id
+    ) {
+        try {
+            return ResponseEntity.ok(userService.unstarChallenge(challenge_id));
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

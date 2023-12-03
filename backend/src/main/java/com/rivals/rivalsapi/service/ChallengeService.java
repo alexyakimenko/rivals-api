@@ -77,4 +77,5 @@ public class ChallengeService {
         return userRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
+
 }
