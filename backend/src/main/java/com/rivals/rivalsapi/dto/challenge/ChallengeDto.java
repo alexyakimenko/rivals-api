@@ -20,14 +20,17 @@ public class ChallengeDto {
     private LocalDateTime creationDate;
     private String title;
     private String description;
+    private Integer stars;
 
     public static ChallengeDto fromChallenge(Challenge challenge) {
+        Integer stars = challenge.getStars() == null ? 0 : challenge.getStars().size();
         return ChallengeDto.builder()
                 .id(challenge.getId())
                 .creator(UserDto.fromUser(challenge.getCreator()))
                 .creationDate(challenge.getCreationDate())
                 .title(challenge.getTitle())
                 .description(challenge.getDescription())
+                .stars(stars)
                 .build();
     }
 }
