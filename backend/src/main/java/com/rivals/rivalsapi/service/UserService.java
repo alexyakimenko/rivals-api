@@ -1,8 +1,12 @@
 package com.rivals.rivalsapi.service;
 
+import com.rivals.rivalsapi.dto.challenge.ChallengeDto;
 import com.rivals.rivalsapi.dto.user.UserDto;
+import com.rivals.rivalsapi.model.Challenge;
 import com.rivals.rivalsapi.model.User;
+import com.rivals.rivalsapi.repository.ChallengeRepository;
 import com.rivals.rivalsapi.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.data.domain.Page;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
 
     public Page<UserDto> getAllUsers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
@@ -63,6 +68,31 @@ public class UserService {
         return user.getFollowers().stream()
                 .map(UserDto::fromUser)
                 .collect(Collectors.toList());
+    }
+
+    public List<ChallengeDto> getStarredChallenges(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return getContextUsers().getStarred()
+                .stream().map(ChallengeDto::fromChallenge)
+                .toList();
+    }
+
+    public ChallengeDto starChallenge(Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        User user = getContextUsers();
+        user.starChallenge(challenge);
+        userRepository.save(user);
+        return ChallengeDto.fromChallenge(challenge);
+    }
+
+    public Object unstarChallenge(Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        User user = getContextUsers();
+        user.unstarChallenge(challenge);
+        userRepository.save(user);
+        return ChallengeDto.fromChallenge(challenge);
     }
 
     private User getContextUsers() {

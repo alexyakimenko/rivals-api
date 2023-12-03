@@ -64,6 +64,14 @@ public class User implements UserDetails {
         following.remove(user);
     }
 
+    public void starChallenge(Challenge challenge) {
+        starred.add(challenge);
+    }
+
+    public void unstarChallenge(Challenge challenge) {
+        starred.remove(challenge);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
