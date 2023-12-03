@@ -1,12 +1,74 @@
 package com.rivals.rivalsapi.service;
 
+import com.rivals.rivalsapi.dto.user.UserDto;
+import com.rivals.rivalsapi.model.User;
 import com.rivals.rivalsapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
+    public UserDto followUser(String username) {
+        Pair<User, User> userContext = getContextUsers(username);
+        User user = userContext.a;
+        User target = userContext.b;
+
+        if (user.equals(target)) throw new IllegalArgumentException("You can't follow yourself");
+        if (user.getFollowing().contains(target)) throw new IllegalArgumentException("You're already following this user");
+        user.follow(target);
+        userRepository.save(user);
+        return UserDto.fromUser(target);
+    }
+
+    public UserDto unfollowUser(String username) {
+        Pair<User, User> userContext = getContextUsers(username);
+        User user = userContext.a;
+        User target = userContext.b;
+
+        if (user.equals(target)) throw new IllegalArgumentException("You can't unfollow yourself");
+        if (!user.getFollowing().contains(target)) throw new IllegalArgumentException("You're not following this user");
+        user.unfollow(target);
+        userRepository.save(user);
+        return UserDto.fromUser(target);
+    }
+
+    public List<UserDto> getFollowing() {
+        User user = getContextUsers();
+        return user.getFollowing().stream()
+                .map(UserDto::fromUser)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserDto> getFollowers() {
+        User user = getContextUsers();
+
+        return user.getFollowers().stream()
+                .map(UserDto::fromUser)
+                .collect(Collectors.toList());
+    }
+
+    private User getContextUsers() {
+        Authentication authorization = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByUsername(authorization.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    private Pair<User, User> getContextUsers(String username) {
+        Authentication authorization = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsername(authorization.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User target = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new Pair<>(user, target);
+    }
 }
