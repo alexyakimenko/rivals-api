@@ -9,14 +9,13 @@ import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,11 +69,15 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public List<ChallengeDto> getStarredChallenges(int pageNumber, int pageSize) {
+    public Page<ChallengeDto> getStarredChallenges(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return getContextUsers().getStarred()
-                .stream().map(ChallengeDto::fromChallenge)
-                .toList();
+        List<ChallengeDto> challengeList = getContextUsers().getStarred().stream()
+                .map(ChallengeDto::fromChallenge).toList();
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), challengeList.size());
+        if(start > end)  return new PageImpl<>(new ArrayList<>(), pageable, challengeList.size());
+        return new PageImpl<>(challengeList.subList(start, end), pageable, challengeList.size());
     }
 
     public ChallengeDto starChallenge(Long challengeId) {
