@@ -47,6 +47,15 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "following")
     private List<User> followers = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+        name = "starred_challenges",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "challenge_id")
+    )
+    private List<Challenge> starred = new ArrayList<>();
+
     public void follow(User user) {
         following.add(user);
     }
