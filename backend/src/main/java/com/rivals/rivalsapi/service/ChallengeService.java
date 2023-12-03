@@ -25,13 +25,10 @@ public class ChallengeService {
     private final UserRepository userRepository;
 
     public ChallengeDto addChallenge(AddChallengeDto challengeDto) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Challenge challenge = AddChallengeDto.toChallenge(challengeDto);
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = getContextUser();
         challenge.setCreator(user);
-        challengeRepository.save(challenge);
-        return ChallengeDto.fromChallenge(challenge);
+        return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
     }
 
     public List<ChallengeDto> getAllChallenges() {
@@ -49,9 +46,7 @@ public class ChallengeService {
     public ChallengeDto deleteChallenge(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
         challengeRepository.delete(challenge);
         return ChallengeDto.fromChallenge(challenge);
@@ -60,9 +55,7 @@ public class ChallengeService {
     public ChallengeDto updateChallenge(Long challengeId, AddChallengeDto challengeDto) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
 
         if(
@@ -74,7 +67,13 @@ public class ChallengeService {
                 !challengeDto.getDescription().isBlank()
         ) challenge.setDescription(challengeDto.getDescription());
 
-        challengeRepository.save(challenge);
-        return ChallengeDto.fromChallenge(challenge);
+
+        return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
+    }
+
+    private User getContextUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }
