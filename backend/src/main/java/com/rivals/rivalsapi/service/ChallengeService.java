@@ -8,12 +8,14 @@ import com.rivals.rivalsapi.repository.ChallengeRepository;
 import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,8 +40,41 @@ public class ChallengeService {
                 .collect(Collectors.toList());
     }
 
-    public Object getChallengeById(Long challengeId) {
-        return challengeRepository.findById(challengeId)
+    public ChallengeDto getChallengeById(Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        return ChallengeDto.fromChallenge(challenge);
+    }
+
+    public ChallengeDto deleteChallenge(Long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
+        challengeRepository.delete(challenge);
+        return ChallengeDto.fromChallenge(challenge);
+    }
+
+    public ChallengeDto updateChallenge(Long challengeId, AddChallengeDto challengeDto) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
+
+        if(
+                challengeDto.getTitle() != null &&
+                !challengeDto.getTitle().isBlank()
+        ) challenge.setTitle(challengeDto.getTitle());
+        if(
+                challengeDto.getDescription() != null &&
+                !challengeDto.getDescription().isBlank()
+        ) challenge.setDescription(challengeDto.getDescription());
+
+        challengeRepository.save(challenge);
+        return ChallengeDto.fromChallenge(challenge);
     }
 }

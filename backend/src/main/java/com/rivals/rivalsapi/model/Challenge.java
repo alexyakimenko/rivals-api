@@ -19,6 +19,8 @@ public class Challenge {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
     @CreationTimestamp
     private LocalDateTime creationDate;
