@@ -1,9 +1,6 @@
 package com.rivals.rivalsapi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +19,12 @@ public class Challenge {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "creator_id", referencedColumnName = "id")
     private User creator;
     @CreationTimestamp
     private LocalDateTime creationDate;
+    @Column(nullable = false)
     private String title;
     private String description;
 }
