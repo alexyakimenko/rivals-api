@@ -5,6 +5,9 @@ import com.rivals.rivalsapi.model.User;
 import com.rivals.rivalsapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +21,11 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
 
+    public Page<UserDto> getAllUsers(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber,pageSize);
+        return userRepository.findAll(pageable)
+                .map(UserDto::fromUser);
+    }
     public UserDto followUser(String username) {
         Pair<User, User> userContext = getContextUsers(username);
         User user = userContext.a;

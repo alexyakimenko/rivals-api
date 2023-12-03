@@ -12,6 +12,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @GetMapping
+    public ResponseEntity<Object> getAllUsers(
+            @RequestParam(defaultValue = "0", required = false) int pageNumber,
+            @RequestParam(defaultValue = "10", required = false) int pageSize
+    ) {
+        try {
+            return ResponseEntity.ok(userService.getAllUsers(pageNumber, pageSize));
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     @GetMapping(path = "/following")
     public ResponseEntity<Object> getFollowing() {
         try {
