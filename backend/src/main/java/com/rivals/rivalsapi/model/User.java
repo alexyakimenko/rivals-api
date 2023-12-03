@@ -1,5 +1,6 @@
 package com.rivals.rivalsapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +34,27 @@ public class User implements UserDetails {
     private String lastName;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "follower_following",
+            joinColumns = @JoinColumn(name = "follower_id"),
+            inverseJoinColumns = @JoinColumn(name = "following_id")
+    )
+    private List<User> following = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "following")
+    private List<User> followers = new ArrayList<>();
+
+    public void follow(User user) {
+        following.add(user);
+    }
+
+    public void unfollow(User user) {
+        following.remove(user);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
