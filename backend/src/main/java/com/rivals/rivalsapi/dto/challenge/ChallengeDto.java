@@ -1,5 +1,6 @@
 package com.rivals.rivalsapi.dto.challenge;
 
+import com.rivals.rivalsapi.dto.user.UserDto;
 import com.rivals.rivalsapi.model.Challenge;
 import com.rivals.rivalsapi.model.User;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ChallengeDto {
     private Long id;
-    private User creator;
+    private UserDto creator;
     private LocalDateTime creationDate;
     private String title;
     private String description;
@@ -23,7 +24,7 @@ public class ChallengeDto {
     public static ChallengeDto fromChallenge(Challenge challenge) {
         return ChallengeDto.builder()
                 .id(challenge.getId())
-                .creator(challenge.getCreator())
+                .creator(UserDto.fromUser(challenge.getCreator()))
                 .creationDate(challenge.getCreationDate())
                 .title(challenge.getTitle())
                 .description(challenge.getDescription())
