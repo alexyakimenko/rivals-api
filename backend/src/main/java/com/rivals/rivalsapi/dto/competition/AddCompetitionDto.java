@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddCompetitionDto {
-        private Long challenger_id;
-        private Long competitor_id;
+        private String targetUsername;
         private Long challenge_id;
 }
