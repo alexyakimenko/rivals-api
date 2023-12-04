@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddCompetitionDto {
         private String targetUsername;
-        private Long challenge_id;
+        private Long challengeId;
 }
