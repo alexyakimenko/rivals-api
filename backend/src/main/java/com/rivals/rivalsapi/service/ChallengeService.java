@@ -26,11 +26,12 @@ import java.util.Objects;
 public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
+    private final UtilityService utilityService;
     private final static Logger logger = LoggerFactory.getLogger(ChallengeService.class);
 
     public ChallengeDto addChallenge(AddChallengeDto challengeDto) {
         Challenge challenge = AddChallengeDto.toChallenge(challengeDto);
-        User user = getContextUser();
+        User user = utilityService.getContextUser();
         challenge.setCreator(user);
         ChallengeDto challengeResponse = ChallengeDto.fromChallenge(challengeRepository.save(challenge));
         logger.info("Challenge with id: {}, has been added", challengeResponse.getId());
@@ -52,7 +53,7 @@ public class ChallengeService {
     public ChallengeDto deleteChallenge(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
-        User user = getContextUser();
+        User user = utilityService.getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
         challengeRepository.delete(challenge);
         logger.info("Challenge with id: {}, has been deleted", challenge.getId());
@@ -62,7 +63,7 @@ public class ChallengeService {
     public ChallengeDto updateChallenge(Long challengeId, AddChallengeDto challengeDto) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
-        User user = getContextUser();
+        User user = utilityService.getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
 
         if(
@@ -77,11 +78,4 @@ public class ChallengeService {
         logger.info("Challenge with id: {}, has been updated", challenge.getId());
         return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
     }
-
-    private User getContextUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userRepository.findByUsername(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
 }
