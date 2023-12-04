@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "follower_following",
