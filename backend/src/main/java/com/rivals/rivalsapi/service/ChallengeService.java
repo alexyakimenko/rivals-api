@@ -5,7 +5,6 @@ import com.rivals.rivalsapi.dto.challenge.ChallengeDto;
 import com.rivals.rivalsapi.model.Challenge;
 import com.rivals.rivalsapi.model.User;
 import com.rivals.rivalsapi.repository.ChallengeRepository;
-import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -14,9 +13,6 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -25,7 +21,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ChallengeService {
     private final ChallengeRepository challengeRepository;
-    private final UserRepository userRepository;
     private final UtilityService utilityService;
     private final static Logger logger = LoggerFactory.getLogger(ChallengeService.class);
 
