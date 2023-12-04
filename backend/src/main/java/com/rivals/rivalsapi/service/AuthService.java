@@ -7,6 +7,8 @@ import com.rivals.rivalsapi.model.Role;
 import com.rivals.rivalsapi.model.User;
 import com.rivals.rivalsapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     public AuthResponseDto register(RegisterDto registerDto) {
         User user = User.builder()
@@ -32,6 +35,7 @@ public class AuthService {
                 .build();
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
+        logger.info("User with username: {}, has been registered", user.getUsername());
         return AuthResponseDto.builder()
                 .token(jwtToken)
                 .build();
@@ -47,6 +51,7 @@ public class AuthService {
         User user = userRepository.findByUsername(authDto.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         String jwtToken = jwtService.generateToken(user);
+        logger.info("User with username: {}, has logged in", user.getUsername());
         return AuthResponseDto.builder()
                 .token(jwtToken)
                 .build();

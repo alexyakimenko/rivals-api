@@ -9,6 +9,8 @@ import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public Page<UserDto> getAllUsers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber,pageSize);
@@ -39,6 +42,7 @@ public class UserService {
         if (user.getFollowing().contains(target)) throw new IllegalArgumentException("You're already following this user");
         user.follow(target);
         userRepository.save(user);
+        logger.info("User {} started following {}", user.getUsername(), target.getUsername());
         return UserDto.fromUser(target);
     }
 
@@ -51,6 +55,7 @@ public class UserService {
         if (!user.getFollowing().contains(target)) throw new IllegalArgumentException("You're not following this user");
         user.unfollow(target);
         userRepository.save(user);
+        logger.info("User {} stopped following {}", user.getUsername(), target.getUsername());
         return UserDto.fromUser(target);
     }
 
@@ -86,6 +91,7 @@ public class UserService {
         User user = getContextUsers();
         user.starChallenge(challenge);
         userRepository.save(user);
+        logger.info("Challenge with id: {} has been starred by {}", challenge.getId(), user.getUsername());
         return ChallengeDto.fromChallenge(challenge);
     }
 
@@ -95,6 +101,7 @@ public class UserService {
         User user = getContextUsers();
         user.unstarChallenge(challenge);
         userRepository.save(user);
+        logger.info("Challenge with id: {} has been starred by {}", challenge.getId(), user.getUsername());
         return ChallengeDto.fromChallenge(challenge);
     }
 

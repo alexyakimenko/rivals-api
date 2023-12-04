@@ -8,6 +8,8 @@ import com.rivals.rivalsapi.repository.ChallengeRepository;
 import com.rivals.rivalsapi.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,12 +26,15 @@ import java.util.Objects;
 public class ChallengeService {
     private final ChallengeRepository challengeRepository;
     private final UserRepository userRepository;
+    private final static Logger logger = LoggerFactory.getLogger(ChallengeService.class);
 
     public ChallengeDto addChallenge(AddChallengeDto challengeDto) {
         Challenge challenge = AddChallengeDto.toChallenge(challengeDto);
         User user = getContextUser();
         challenge.setCreator(user);
-        return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
+        ChallengeDto challengeResponse = ChallengeDto.fromChallenge(challengeRepository.save(challenge));
+        logger.info("Challenge with id: {}, has been added", challengeResponse.getId());
+        return challengeResponse;
     }
 
     public Page<ChallengeDto> getAllChallenges(int pageNumber, int pageSize) {
@@ -50,6 +55,7 @@ public class ChallengeService {
         User user = getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
         challengeRepository.delete(challenge);
+        logger.info("Challenge with id: {}, has been deleted", challenge.getId());
         return ChallengeDto.fromChallenge(challenge);
     }
 
@@ -68,7 +74,7 @@ public class ChallengeService {
                 !challengeDto.getDescription().isBlank()
         ) challenge.setDescription(challengeDto.getDescription());
 
-
+        logger.info("Challenge with id: {}, has been updated", challenge.getId());
         return ChallengeDto.fromChallenge(challengeRepository.save(challenge));
     }
 
