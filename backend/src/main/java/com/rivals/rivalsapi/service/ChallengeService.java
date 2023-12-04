@@ -50,6 +50,11 @@ public class ChallengeService {
         return ChallengeDto.fromChallenge(challenge);
     }
 
+    public Challenge getActualChallengeById(Long challengeId) {
+        return challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+    }
+
     public ChallengeDto deleteChallenge(Long challengeId) {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
