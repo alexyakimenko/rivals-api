@@ -31,6 +31,6 @@ public class Challenge {
     private String title;
     private String description;
     @JsonIgnore
-    @ManyToMany(mappedBy = "starred")
+    @ManyToMany(mappedBy = "starred", fetch = FetchType.EAGER)
     private List<User> stars = new ArrayList<>();
 }
