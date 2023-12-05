@@ -84,16 +84,20 @@ public class UserService {
     public ChallengeDto starChallenge(Long challengeId) {
         Challenge challenge = challengeService.getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
+        if (user.getStarred().contains(challenge)) throw new IllegalArgumentException("You've already starred this challenge");
         user.starChallenge(challenge);
+        challenge.getStars().add(user);
         userRepository.save(user);
         logger.info("Challenge with id: {} has been starred by {}", challenge.getId(), user.getUsername());
         return ChallengeDto.fromChallenge(challenge);
     }
 
-    public Object unstarChallenge(Long challengeId) {
+    public ChallengeDto unstarChallenge(Long challengeId) {
         Challenge challenge = challengeService.getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
+        if (user.getStarred().contains(challenge)) throw new IllegalArgumentException("You're not starred this challenge");
         user.unstarChallenge(challenge);
+        challenge.getStars().remove(user);
         userRepository.save(user);
         logger.info("Challenge with id: {} has been starred by {}", challenge.getId(), user.getUsername());
         return ChallengeDto.fromChallenge(challenge);
