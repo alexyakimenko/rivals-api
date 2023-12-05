@@ -4,17 +4,12 @@ import com.rivals.rivalsapi.dto.challenge.ChallengeDto;
 import com.rivals.rivalsapi.dto.user.UserDto;
 import com.rivals.rivalsapi.model.Challenge;
 import com.rivals.rivalsapi.model.User;
-import com.rivals.rivalsapi.repository.ChallengeRepository;
 import com.rivals.rivalsapi.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.misc.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final ChallengeRepository challengeRepository;
+    private final ChallengeService challengeService;
     private final UtilityService utilityService;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -87,8 +82,7 @@ public class UserService {
     }
 
     public ChallengeDto starChallenge(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Challenge challenge = challengeService.getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
         user.starChallenge(challenge);
         userRepository.save(user);
@@ -97,8 +91,7 @@ public class UserService {
     }
 
     public Object unstarChallenge(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Challenge challenge = challengeService.getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
         user.unstarChallenge(challenge);
         userRepository.save(user);
