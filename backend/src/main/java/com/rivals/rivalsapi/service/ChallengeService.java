@@ -40,8 +40,7 @@ public class ChallengeService {
     }
 
     public ChallengeDto getChallengeById(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Challenge challenge = getActualChallengeById(challengeId);
         return ChallengeDto.fromChallenge(challenge);
     }
 
@@ -51,8 +50,7 @@ public class ChallengeService {
     }
 
     public ChallengeDto deleteChallenge(Long challengeId) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Challenge challenge = getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
         challengeRepository.delete(challenge);
@@ -61,8 +59,7 @@ public class ChallengeService {
     }
 
     public ChallengeDto updateChallenge(Long challengeId, AddChallengeDto challengeDto) {
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new EntityNotFoundException("Challenge not found"));
+        Challenge challenge = getActualChallengeById(challengeId);
         User user = utilityService.getContextUser();
         if(!Objects.equals(user.getId(), challenge.getCreator().getId())) throw new PermissionDeniedDataAccessException("You have no rights to do this action", new Throwable());
 
