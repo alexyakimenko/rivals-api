@@ -26,18 +26,18 @@ public class UserRepositoryTests {
     @Test
     void findByUsername_shouldFindUser() {
         User user = User.builder()
-                .username("Alyekx")
+                .username("username")
                 .password("testpassword")
                 .firstName("Alexandr")
                 .build();
         userRepository.save(user);
-        Optional<User> savedUser = userRepository.findByUsername("Alyekx");
+        Optional<User> savedUser = userRepository.findByUsername("username");
         Assertions.assertTrue(savedUser.isPresent());
     }
 
     @Test
     void findByUsername_shouldNotFindUser() {
-        Optional<User> savedUser = userRepository.findByUsername("Alyekx");
+        Optional<User> savedUser = userRepository.findByUsername("username");
         Assertions.assertTrue(savedUser.isEmpty());
     }
 }
